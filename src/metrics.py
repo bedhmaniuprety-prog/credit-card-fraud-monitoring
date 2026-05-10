@@ -9,10 +9,10 @@ def evaluate_binary(y_true, y_prob, threshold=0.5):
         "f1":        f1_score(y_true, y_pred, zero_division=0),
         "roc_auc":   np. nan if len(np.unique(y_true)) < 2 else roc_auc_score(y_true, y_prob),
         "pr_auc":    np.nan if len(np.unique(y_true)) < 2 else average_precision_score(y_true,y_prob),  
-}
-tn, fp, fn, tp = confusion_matrix(y_true, y_pred, labels=[0,1]).ravel()
-out.update({"tn": tn, "fn": fn, "tp": tp, "threshold": threshold})
-return out
+    }
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred, labels=[0,1]).ravel()
+    out.update({"tn": tn, "fn": fn, "tp": tp, "threshold": threshold})
+    return out
 def threshold_search(y_true, y_prob, thresholds=None):
     if thresholds is None:
         thresholds = np.round(np.arange(0.05, 0.96, 0.01), 2)
