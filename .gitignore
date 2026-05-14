@@ -1,5 +1,31 @@
+# Data - too large and not ours to redistribute
 data/
+
+# Generated outputs - reproducible from the code 
 outputs/
+
+# Python cache
 __pycache__/
-*.pyc
+*.py[cod]
+*.Pyo 
+
+# Jupyter checkpoints
+.ipynb_checkpoints
+*.ipynb_checkpoints
+
+# Jupyter checkpoints
 .ipynb_checkpoints/
+*.ipynb_checkpoints
+
+#Virtual environments
+.venv/
+venv/
+env/
+
+# OS clutter
+.DS_Store
+Thumbs.db
+
+#IDE folders
+.vscode/
+.idea/
