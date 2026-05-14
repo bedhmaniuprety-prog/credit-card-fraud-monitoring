@@ -12,9 +12,7 @@ from src.metrics import evaluate_binary, threshold_search
 
 
 def get_model_prob(model, X):
-    """Return positive-class probabilities, works for Pipeline and plain models."""
-    if hasattr(model, "predict_proba"):
-        return model.decision_function(X)
+    return model.predict_proba(X)[:, 1]
     
 
 def  build_baseline_models():
@@ -26,7 +24,7 @@ def  build_baseline_models():
         ))
     ])
     rf = RandomForestClassifier(
-        n_estunatirs=250,
+        n_estimators=250,
         max_depth=None,
         min_samples_leaf=1,
         n_jobs=1,
@@ -45,7 +43,7 @@ def train_baselines(X_train, Y_train, X_val, Y_val, X_test, Y_test):
     rows = []
     trained = {}
 
-    for name, model in model.items():
+    for name, model in models.items():
         model.fit(X_train, Y_train)
         val_prob = get_model_prob(model, X_val)
         thresh   = float(threshold_search(Y_val, val_prob). iloc[0]["threshold"])
@@ -70,7 +68,7 @@ def fit_xgb(X_train, Y_train, params):
     return model
 
 
-def  xgb_grid_search(X_train, X_val, Y_val):
+def xgb_grid_search(X_train, y_train, X_val, y_val):
     """
     Run grid search over XGB_PARAM_GRID< select best model by val PR- AUC.
     Returns (best_model, best_params, grid_df).
@@ -79,10 +77,10 @@ def  xgb_grid_search(X_train, X_val, Y_val):
     best_model, best_params, best_score = None, None, -1
 
     for params in XGB_PARAM_GRID:
-        model      = fit_xgb(X_train, Y_train, params)
+        model      = fit_xgb(X_train, y_train, params)
         Val_prob   = model.predict_proba(X_val)[:, 1]
-        pr_auc     = average_precision_score(Y_val, Val_prob)
-        roc_auc    = roc_auc_score(Y_val, Val_prob) if len(np.unique(Y_val)) > 1 else np.nan
+        pr_auc     = average_precision_score(y_val, Val_prob)
+        roc_auc    = roc_auc_score(y_val, Val_prob) if len(np.unique(y_val)) > 1 else np.nan
         rows.append({**params, "val_pr_auc": pr_auc, "val_roc_auc": roc_auc})
         if pr_auc > best_score:
             best_score, best_model, best_params = pr_auc, model, params

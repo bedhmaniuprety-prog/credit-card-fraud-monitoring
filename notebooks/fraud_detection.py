@@ -1,7 +1,11 @@
 # ---- Fraud Detection Pipeline ---------
 # Run from the repo root: python notebools/fraud_detection.py
 
-import Warnings
+import warnings
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -11,7 +15,7 @@ from sklearn.metrics import confusion_matrix, classification_report
 warnings.filterwarnings("ignore")
 
 from src.config import OUTPUT_DIR, SEED, WINDOW_SIZE
-from src_data import load_and_prepare, temporal_split, get_xy, FEATURE_COLS
+from src.data import load_and_prepare, temporal_split, get_xy, FEATURE_COLS
 from src.metrics import evaluate_binary, threshold_search
 from src.models import train_baselines, xgb_grid_search, fit_xgb, get_model_prob
 from src.monitoring import make_windows, monitor_no_retrain, monitor_rolling_retrain, monitor_event_retrain
@@ -19,13 +23,13 @@ from src.visualization import plot_confusion, plot_roc_pr_curves
 
 
 np.random.seed(SEED)
-OUTPUT_DIR.MKDIR(exist_ok=True)
+OUTPUT_DIR.mkdir(exist_ok=True)
 
 # --- 1. Load & split ---------
-df = loas_and_prepare()
+df = load_and_prepare()
 train_df, val_df, test_df = temporal_split(df)
 
-feature_cols = FEATURE_COLS    # set by load_and_prepare()
+feature_cols = [c for c in df.columns if c != "Class"]    # set by load_and_prepare()
 
 X_train, Y_train = get_xy(train_df, feature_cols)
 X_val,   Y_val   = get_xy(val_df,   feature_cols)
@@ -37,11 +41,11 @@ print("Train:", X_train.shape, "| Val:", X_val.shape, "| Test:", X_test.shape)
 summary = pd.DataFrame({
     "segment":      ["full", "train", "validation", "test"],
     "total":        [len(df), len(train_df), len(val_df), len(test_df)],
-    "fraud":        [int(s["class"].sum()) for s in [df, train_df, val_df, test_df]],
+    "fraud":        [int(s["Class"].sum()) for s in [df, train_df, val_df, test_df]],
 })
 summary["genuine"]   = summary["total"] - summary["fraud"]
 summary["fraud_rate"]= summary["fraud"] / summary["total"]
-summary.to.csv(OUTPUT_DIR / "dataset_summary.csv", index=False)
+summary.to_csv(OUTPUT_DIR / "dataset_summary.csv", index=False)
 print(summary)
 
 #--- 3. Baseline models --------
@@ -63,7 +67,7 @@ print("Best XGB threshold:", best_threshold)
 
 # ---- 5. Final evaluation -------
 xgb_test_prob = best_model.predict_proba(X_test)[:, 1]
-xgb_result    = pd,DataFrame([{"model": "XGBoost",
+xgb_result    = pd.DataFrame([{"model": "XGBoost",
                                **evaluate_binary(Y_test, xgb_test_prob, best_threshold)}])
 all_results   =pd.concat([baseline_results, xgb_result], ignore_index=True)
 all_results.to_csv(OUTPUT_DIR / "all_model_results.csv", index=False)
