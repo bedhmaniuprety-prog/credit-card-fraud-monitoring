@@ -15,23 +15,25 @@ thesis project (Chapter 4).
    - **Rolling retraining** — model retrained every N windows on accumulated data
    - **Event-based retraining** — retraining triggered by recall drop or PSI drift alert
 
-## Repo structure
+## Repository Structure
 
+```text
 credit-card-fraud-monitoring/
 ├── data/                  # Place creditcard.csv here (not tracked by Git)
 ├── notebooks/
 │   └── fraud_detection.py # Main pipeline script
 ├── outputs/               # Generated CSVs and plots (not tracked by Git)
 ├── src/
-│   ├── config.py          # All constants and hyperparameters
+│   ├── config.py          # Constants and hyperparameters
 │   ├── data.py            # Data loading, feature engineering, splitting
-│   ├── metrics.py         # evaluate_binary, threshold_search, make_psi
-│   ├── models.py          # Baseline models, XGBoost grid search
-│   ├── monitoring.py      # Three monitoring strategies
-│   └── visualization.py   # ROC/PR curves, confusion matrix plots
+│   ├── metrics.py         # Evaluation, threshold search, PSI
+│   ├── models.py          # Baseline models and XGBoost grid search
+│   ├── monitoring.py      # Monitoring strategies
+│   └── visualization.py   # ROC, PR curves, and confusion matrix plots
 ├── .gitignore
 ├── README.md
 └── requirements.txt
+```
 
 ## Setup
 
@@ -46,12 +48,18 @@ cd credit-card-fraud-monitoring
 pip install -r requirements.txt
 ```
 
-**3. Add the dataset**
+## 3. Add the Dataset
 
-Download `creditcard.csv` from [Kaggle](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud)
-and place it in the `data/` folder:
+Download `creditcard.csv` from the [Kaggle Credit Card Fraud Detection dataset](https://www.kaggle.com/datasets/mlg-ulb/creditcardfraud).
+
+Place the file inside the `data/` folder:
+
+```text
 data/
 └── creditcard.csv
+```
+
+> Note: The dataset is not tracked by Git because it is large. Make sure `data/` is included in `.gitignore`.
 
 **4. Run the pipeline**
 ```bash
