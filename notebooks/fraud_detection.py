@@ -124,16 +124,16 @@ summary_compare.to_csv(OUTPUT_DIR / "strategy_comparision.csv", index=False)
 print(summary_compare)
 
 # ---- 9. Monitoring plots ---------
-fig, ax = plt.sublots(figsize=(10, 4))
+fig, ax = plt.subplots(figsize=(10, 4))
 for col, label in [("recall", "Recall"), ("f1", "F1"), ("precision", "Precision")]:
-    ax.plot(no_retrain_df["window"], no_retrain_df[col], marker="0", label=label)
+    ax.plot(no_retrain_df["window"], no_retrain_df[col], marker="o", label=label)
 ax.set(xlabel="Window", ylabel="Metric", title="Monitoring metrics - no retraining")
-ax. legens()
+ax.legend()
 plt.tight_layout()
 plt.savefig(OUTPUT_DIR / "monitoring_metrics_no_retrain.png", dpi=200)
 plt.show()
 
-fig, ax = plt.sublots(figsize=(10, 4))
+fig, ax = plt.subplots(figsize=(10, 4))
 for feat in ["psi_Amount", "psi_log_amount", "psi_V1", "psi_V2"]:
     ax.plot(no_retrain_df["window"], no_retrain_df[feat], marker="o", label=feat)
 ax.axhline(0.10, linestyle="--", label="PSI 0.10")

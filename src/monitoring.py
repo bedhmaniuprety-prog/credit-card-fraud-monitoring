@@ -20,7 +20,7 @@ def make_windows(df, size):
 def _base_row(window_idx, strategy, win, feature_cols, model, threshold, reference_df):
     """Compute metrics and PSI for a single window. Used by all three strategies."""
     X   = win[feature_cols]
-    Y   = win["Class"].astype(int)
+    y   = win["Class"].astype(int)
     prob = model.predict_proba(X)[:, 1]
     metrics = evaluate_binary(y, prob, threshold)
     row = {
@@ -39,7 +39,7 @@ def monitor_no_retrain(model, threshold, windows, reference_df, feature_cols):
     """Evalute a fixed model over all windows with no retraining."""
     rows = [
         _base_row(i, "no_retrain", win, feature_cols, model, threshold, reference_df)
-        for i, win in enumerate(windows, starts=1)
+        for i, win in enumerate(windows, start=1)
     ]
     return pd.DataFrame(rows)
 
@@ -66,7 +66,7 @@ def monitor_rolling_retrain(
         if i % retrain_every == 0:
             current_train = pd.concat([current_train] + seen, ignore_index=True)
             X_tr = current_train[feature_cols]
-            Y_tr = current_train["class"].astype(int)
+            Y_tr = current_train["Class"].astype(int)
             model = fit_xgb(X_tr, Y_tr, best_params)
             row["retrained"] = 1
             seen = []
